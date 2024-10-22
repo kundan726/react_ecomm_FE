@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { PRODUCTS } from "../constants/constants";
-import { postCall } from "../services/authServices/axios/apiCall";
+import { postCall, getCall } from "../services/authServices/axios/apiCall";
 import ENDPOINTS from "../api/endpoints";
 import { useUserContext } from "../context/userContext.jsx";
 export default function AddProduct() {
   const { id } = useParams();
-  const { userEmail } = useUserContext();
-  console.log("productToEdit", id);
-  console.log("userEmail", userEmail);
+  const { userEmail, setUserEmail } = useUserContext();
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
   const [productImage, setProductImage] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  //
   const [productCategory, setProductCategory] = useState("");
   // const [productSubcategory, setProductSubcategory] = useState("");
   const [productSKU, setProductSKU] = useState("");
@@ -39,70 +36,151 @@ export default function AddProduct() {
   const [productSEODescription, setProductSEODescription] = useState("");
   const [productSEOKeywords, setProductSEOKeywords] = useState("");
   const [productQuantity, setProductQuantity] = useState("");
-
+  const [fetchedProduct, setFetchedProduct] = useState("");
   //
-  useEffect(() => {
-    if (id) {
-      const fetchedProduct = PRODUCTS.find((item) => item.id == id);
-      console.log("fetchedProduct", fetchedProduct);
-      if (fetchedProduct) {
-        setProductName(fetchedProduct.productName);
-        setProductPrice(fetchedProduct.productPrice);
-        // setProductImage(fetchedProduct.productImage);
-        setProductDescription(fetchedProduct.productDescription);
-        setIsEditing(true);
-      }
+
+  const fetchProduct = async (id) => {
+    try {
+      const params = {
+        apiEndpoint: ENDPOINTS?.dev?.PRODUCT_MODULE?.fetchProduct(id),
+        data: {},
+      };
+      const response = await getCall(params);
+      console.log("response for editing", response);
+      setFetchedProduct(response?.response);
+    } catch (error) {
+      console.error("Error in fetchProduct:", error);
     }
+  };
+
+  useEffect(() => {
+    const fetchAndSetProduct = async () => {
+      if (id) {
+        try {
+          const product = await fetchProduct(id);
+          if (product) {
+            setFetchedProduct(product);
+          }
+        } catch (error) {
+          console.log("Error in fetching product", error);
+        }
+      }
+    };
+    fetchAndSetProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (fetchedProduct) {
+      setProductName(fetchedProduct?.productName);
+      setProductPrice(fetchedProduct?.productPrice);
+      setProductDescription(fetchedProduct?.productDescription);
+      setProductWeight(fetchedProduct?.productWeight);
+      setProductAdditionalImages(fetchedProduct?.productAdditionalImages);
+      setProductBrand(fetchedProduct?.productBrand);
+      setProductCategory(fetchedProduct?.productCategory); // Ensure this exists
+      setProductSKU(fetchedProduct?.productSKU);
+      setProductDimensions(fetchedProduct?.productDimensions);
+      setProductColorVariations(fetchedProduct?.productColorVariations);
+      setProductTags(fetchedProduct?.productTags);
+      setProductShippingInfo(fetchedProduct?.productShippingInfo);
+      setProductStockStatus(fetchedProduct?.productStockStatus);
+      setProductDiscount(fetchedProduct?.productDiscount);
+      setProductInstructions(fetchedProduct?.productInstructions);
+      setProductReturnPolicy(fetchedProduct?.productReturnPolicy);
+      setProductWarranty(fetchedProduct?.productWarranty);
+      setProductDateAdded(fetchedProduct?.productDateAdded);
+      setProductStatus(fetchedProduct?.productStatus);
+      setProductSEOTitle(fetchedProduct?.productSEOTitle);
+      setProductSEODescription(fetchedProduct?.productSEODescription);
+      setProductSEOKeywords(fetchedProduct?.productSEOKeywords);
+      setProductQuantity(fetchedProduct?.productQuantity)
+      // setProductImage(fetchedProduct?.imageURL); // Assuming you want to store the image URL separately
+      setIsEditing(true);
+    }
+  }, [fetchedProduct]);
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("userEmail");
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+  }, []); 
+  
+  useEffect(() => {
+    if (userEmail) {
+      localStorage.setItem("userEmail", userEmail);
+    }
+  }, [userEmail]);
+  
+
+  useEffect(() => {
+    setIsEditing(false);
+  },[id])
+
   const formSubmit = async (e) => {
     try {
       e.preventDefault();
+      const formData = new FormData();
+      formData.append("productName", productName);
+      formData.append("productPrice", productPrice);
+      formData.append("productImage", e.target.productImage.files[0]);
+      formData.append("productDescription", productDescription);
+      formData.append("userEmail", userEmail);
+      formData.append("productCategory", productCategory);
+      formData.append("productSKU", productSKU);
+      formData.append("productBrand", productBrand);
+      formData.append("productWeight", productWeight);
+      formData.append("productDimensions", productDimensions);
+      formData.append("productColorVariations", productColorVariations);
+      formData.append("productTags", productTags);
+      formData.append("productShippingInfo", productShippingInfo);
+      formData.append("productStockStatus", productStockStatus);
+      formData.append("productDiscount", productDiscount);
+      formData.append("productAdditionalImages", productAdditionalImages);
+      formData.append("productInstructions", productInstructions);
+      formData.append("productReturnPolicy", productReturnPolicy);
+      formData.append("productWarranty", productWarranty);
+      formData.append("productDateAdded", productDateAdded);
+      formData.append("productStatus", productStatus);
+      formData.append("productSEOTitle", productSEOTitle);
+      formData.append("productSEODescription", productSEODescription);
+      formData.append("productSEOKeywords", productSEOKeywords);
+  
+      formData.forEach((value, key) => {
+        console.log(`${key}:`, value);
+      });
+  
       if (!isEditing) {
-        const formData = new FormData();
-        formData.append("productName", productName);
-        formData.append("productPrice", productPrice);
-        formData.append("productImage", e.target.productImage.files[0]);
-        formData.append("productDescription", productDescription);
-        formData.append("userEmail", userEmail);
-        formData.append('productCategory',productCategory);
-        // formData.append("productSubcategory",productSubcategory);
-        formData.append("productSKU",productSKU);
-        formData.append("productBrand",productBrand);
-        formData.append("productWeight",productWeight);
-        formData.append("productDimensions",productDimensions);
-        formData.append("productColorVariations",productColorVariations);
-        formData.append("productTags",productTags);
-        formData.append("productShippingInfo",productShippingInfo);
-        formData.append("productStockStatus",productStockStatus);
-        formData.append("productDiscount",productDiscount);
-        // formData.append("productFeaturedImage",productFeaturedImage);
-        formData.append("productAdditionalImages",productAdditionalImages);
-        formData.append("productInstructions",productInstructions);
-        formData.append("productReturnPolicy",productReturnPolicy);
-        formData.append("productWarranty",productWarranty);
-        formData.append("productDateAdded",productDateAdded);
-        formData.append("productStatus",productStatus);        
-        formData.append("productSEOTitle",productSEOTitle);
-        formData.append("productSEODescription",productSEODescription);
-        formData.append("productSEOKeywords",productSEOKeywords);
-
+        // Add product logic
+        console.log("Adding new product:", formData);
         const params = {
           apiEndpoint: ENDPOINTS?.dev?.PRODUCT_MODULE?.addProduct,
           data: formData,
         };
-
-        console.log("Params", params);
+  
         const response = await postCall(params);
-        console.log("Responseeee", response);
+        console.log("Response:", response);
       } else {
-        console.log("In editing mode");
+        // Edit product logic
+        formData.append("id", id);
+        formData.forEach((value, key) => {
+          console.log(`Editing ${key}:`, value); 
+        });
+  
+        const params = {
+          apiEndpoint: ENDPOINTS?.dev?.PRODUCT_MODULE?.editProduct,
+          data: formData,
+        };
+  
+        const response = await postCall(params);
+        console.log("Edited product response:", response);
       }
-      setProductName("");
-      setProductPrice("");
-      setProductDescription("");
-      setProductImage("");
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error during form submission:", error);
+    }
   };
+  
+
   return (
     <div className="flex p-20 justify-center w-full border border-black shadow-xl rounded-lg">
       <div className="w-full">
@@ -156,7 +234,7 @@ export default function AddProduct() {
                 placeholder="Upload Image"
                 className="p-4 border focus:outline-none rounded-lg mt-1 w-full"
                 value={productImage}
-                onChange={(e) => setProductImage(e.target.value)}
+                onChange={(e) => setProductImage(e.target.files[0])}
               />
             </div>
             <div>
@@ -210,16 +288,16 @@ export default function AddProduct() {
                 required
               >
                 <option value="">Select Category</option>
-                <option value="">Clothing</option>
-                <option value="">Electronics</option>
-                <option value="">Furniture</option>
-                <option value="">Study</option>
-                <option value="">Educational</option>
-                <option value="">Beauty & more</option>
-                <option value="">Gadgets</option>
-                <option value="">Toys,Baby</option>
-                <option value="">Food & Health</option>
-                <option value="">Sports</option>
+                <option value="clothing">Clothing</option>
+                <option value="electronics">Electronics</option>
+                <option value="furniture">Furniture</option>
+                <option value="study">Study</option>
+                <option value="educational">Educational</option>
+                <option value="beauty">Beauty & more</option>
+                <option value="gadgets">Gadgets</option>
+                <option value="toys_baby">Toys, Baby</option>
+                <option value="food_health">Food & Health</option>
+                <option value="sports">Sports</option>
               </select>
             </div>
 
@@ -256,7 +334,6 @@ export default function AddProduct() {
                 className="p-4 border focus:outline-none rounded-lg mt-1 w-full"
                 value={productSKU}
                 onChange={(e) => setProductSKU(e.target.value)}
-                required
               />
             </div>
 

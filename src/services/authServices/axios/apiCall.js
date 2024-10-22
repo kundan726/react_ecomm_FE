@@ -26,13 +26,11 @@ export const postCall = async (params) => {
   
 export const getCall = async(params) => {
     try {
-        const response = await axios.get(params?.ApiEndpoint, data);
-        return response;
+        const response = await axios.get(params?.apiEndpoint, {params : params?.data});
+        console.log("Response in getCall",response);
+        return response?.data;
     } catch (error) {
         console.log("Error inside getCall",error);
         throw error;
     }
 };
-
-// export default {postCall, getCall}
-// module.exports = {postCall, getCall}
