@@ -1,18 +1,22 @@
 import React from "react";
 import { useCartContext } from "../../context/cartContext";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-
+import { FIELDS_NOT_TO_SHOW } from "../../constants/constants";
 export default function AddToCart() {
   const { cartItems, setCartItems } = useCartContext();
   console.log("cartItems", cartItems);
 
   const formatLabel = (label) => {
-    return label.replace("product", "").trim();
+    return label
+      .replace("product", "") // Remove the word "product"
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2") // Add space before capital letters
+      .trim();
   };
 
-  const handleRemoveFromCart = (id) => {
-    console.log("id", id);
-    const updatedCartItems = cartItems.filter((item) => item.id !== id);
+  const handleRemoveFromCart = (_id) => {
+    console.log("id", _id);
+    const updatedCartItems = cartItems.filter((item) => item._id !== _id);
     setCartItems(updatedCartItems);
     console.log("Updated cartItems", updatedCartItems);
   };
@@ -27,24 +31,28 @@ export default function AddToCart() {
               className=" border border-collapse p-4 rounded-lg shadow-md"
             >
               <img
-                src={item?.productImage}
+                src={item?.imageURL}
                 alt={item?.productName}
                 className="w-32 h-32 object-cover mb-4 rounded-md"
               />
               {Object.entries(item).map(([key, value]) => {
                 if (key.startsWith("product") && key !== "productImage") {
-                  return (
-                    <p key={key} className="text-gray-700">
-                      <span className="font-semibold">{formatLabel(key)}:</span>{" "}
-                      {value}
-                    </p>
-                  );
+                  if (!FIELDS_NOT_TO_SHOW.includes(key)) {
+                    return (
+                      <p key={key} className="text-gray-700">
+                        <span className="font-semibold">
+                          {formatLabel(key)}:
+                        </span>{" "}
+                        {value}
+                      </p>
+                    );
+                  }
                 }
                 return null;
               })}
               <button
                 className="mt-2 bg-amber-600 text-white p-2 rounded-md hover:bg-amber-700"
-                onClick={() => handleRemoveFromCart(item.id)}
+                onClick={() => handleRemoveFromCart(item._id)}
               >
                 Remove from Cart
               </button>

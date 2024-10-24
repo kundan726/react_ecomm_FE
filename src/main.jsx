@@ -6,17 +6,20 @@ import Navbar from "./components/navbar/Navbar.jsx";
 import { BrowserRouter as Router } from "react-router-dom";
 import { UserContextProvider } from "./context/userContext.jsx";
 import { CartContextProvider } from "./context/cartContext.jsx";
+import { AuthContextProvider } from "./context/authContect.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <UserContextProvider>
-      <CartContextProvider>
-        <Router>
-          <Navbar />
-          <App />
-        </Router>
-        {/* {" "} */}
-      </CartContextProvider>
-    </UserContextProvider>
+    <AuthContextProvider>
+      <UserContextProvider>
+        <CartContextProvider>
+          <Router>
+            <Navbar />
+            <App />
+          </Router>
+          {/* {" "} */}
+        </CartContextProvider>
+      </UserContextProvider>
+    </AuthContextProvider>
   </StrictMode>
 );

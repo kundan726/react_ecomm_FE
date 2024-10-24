@@ -24,4 +24,18 @@ const authToast = (response) => {
   }
 };
 
-export default authToast;
+const deleteToast = async (response) => {
+  console.log("resposne",response);
+  if(response?.data?.msg === 'Product Deleted Successfully'){
+    console.log("1")
+    toast.success('Product Deleted Successfully',{
+      duration: 5000,
+      position: 'top-left',
+      style: {
+        background: '#4ade80',
+        color: '#fff',
+      }
+    })
+  }
+}
+export {authToast , deleteToast};

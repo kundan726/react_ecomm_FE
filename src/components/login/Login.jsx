@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import loginService from "../../services/authServices/loginService";
 import { Toaster } from "react-hot-toast";
-// import { useUserContext } from "../../context/userContext";
-// import { useUserContext } from "../../context/userContext";
 import { useUserContext } from "../../context/userContext.jsx";
-
+import { useAuthContext } from "../../context/authContect.jsx";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const {setUserEmail} = useUserContext();
+  const { setAuthDetails } = useAuthContext();
   const formSubmit = async (event) => {
     try {
       event.preventDefault();
@@ -21,6 +20,7 @@ export default function Login() {
       console.log("TOken", serviceResponse?.data?.response?.token);
       if (serviceResponse?.data?.msg === "Login successful") {
         localStorage.setItem("token", serviceResponse?.data?.response?.token);
+        setAuthDetails(serviceResponse?.data?.response);
         setUserEmail(email);
         navigate("/");
         window.dispatchEvent(new Event('storage'));

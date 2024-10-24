@@ -1,4 +1,4 @@
-const priceCalculator = (price,discount) => {
+const priceCalculator = async (price,discount) => {
     try {
         const priceAfterDiscount = Math.ceil(discount/100 * price)
         console.log("priceAfterDiscount",priceAfterDiscount);
