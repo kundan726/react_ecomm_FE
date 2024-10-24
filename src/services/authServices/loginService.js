@@ -1,6 +1,6 @@
 import axios from "axios";
 import ENDPOINTS from "../../api/endpoints";
-import authToast from "../../toast/authToast";
+import {authToast} from '../../toast/authToast'
 const loginService = async (formData) => {
     try {
         console.log("formData",formData)

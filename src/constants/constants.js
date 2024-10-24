@@ -237,6 +237,8 @@ const ORDER_LIST = [
     "productName": "Headphones"
   }
 ]
-
+const FIELDS_NOT_TO_SHOW = [
+  'createdAt','productDateAdded','productStatus','productAdditionalImages', 'productSEODescription','productSEOKeywords','productSEOTitle','productSKU','productShippingInfo','productShippingInfo','productTags','updatedAt','productCategory'
+]
 const ORDERLIST_TABLE_HEAD = ['ORDER ID','PRODUCT NAME','CUSTOMER NAME','ORDER STATUS','ORDER DATE AND TIME','TOTAL AMOUNT','PAYMENT STATUS']
-export { PAGES, CARD_DATA, TEAM_MEMBERS, DASHBOARD_MENU, PRODUCTS, ORDER_LIST,ORDERLIST_TABLE_HEAD };
+export { PAGES, CARD_DATA, TEAM_MEMBERS, DASHBOARD_MENU, PRODUCTS, ORDER_LIST,ORDERLIST_TABLE_HEAD, FIELDS_NOT_TO_SHOW };

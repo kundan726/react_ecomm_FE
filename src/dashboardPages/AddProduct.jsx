@@ -234,7 +234,7 @@ export default function AddProduct() {
                 placeholder="Upload Image"
                 className="p-4 border focus:outline-none rounded-lg mt-1 w-full"
                 value={productImage}
-                onChange={(e) => setProductImage(e.target.files[0])}
+                onChange={(e) => setProductImage(e.target.value)}
               />
             </div>
             <div>

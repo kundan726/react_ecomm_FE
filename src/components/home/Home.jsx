@@ -2,23 +2,29 @@ import React, { useState , useEffect} from "react";
 import DynamicCard from "../utilities/DynamicCard";
 import { CARD_DATA, PRODUCTS } from "../../constants/constants";
 import Contact from "../contactUs/Contact";
-import url from "../../api/endpoints";
+import ENDPOINTS from "../../api/endpoints";
 import axios from "axios";
+import {getCall, postCall} from '../../services/authServices/axios/apiCall';
+
 export default function Home() {
   const [apiResponse, setApiResponse] = useState([]);
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.get(url?.dev?.productApi);
-  //       console.log("Response:", response.data);
-  //       setApiResponse(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = {
+          apiEndpoint : ENDPOINTS?.dev?.PRODUCT_MODULE?.listProduct,
+          data : {}
+        }
+        const response = await getCall(params);
+        console.log("Response:", response);
+        setApiResponse(response.response);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-  //   fetchData();
-  // }, []);
+    fetchData();
+  }, []);
   
   return (
     <div className="bg-gray-100">
@@ -38,12 +44,12 @@ export default function Home() {
           Explore Our Work
         </button>
         <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PRODUCTS.map((card, index) => (
+          {apiResponse.map((card, index) => (
             <DynamicCard
               key={index}
               title={card.productName}
               description={card.productDescription}
-              imageUrl={card.productImage}
+              imageUrl={card.imageURL}
               price={card.productPrice}
               bgColor={card.bgColor}
               productDetails= {card}

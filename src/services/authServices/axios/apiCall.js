@@ -26,6 +26,7 @@ export const postCall = async (params) => {
   
 export const getCall = async(params) => {
     try {
+      console.log("///////",params);
         const response = await axios.get(params?.apiEndpoint, {params : params?.data});
         console.log("Response in getCall",response);
         return response?.data;

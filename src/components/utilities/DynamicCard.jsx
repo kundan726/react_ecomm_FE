@@ -14,20 +14,21 @@ export default function DynamicCard({
   const navigate = useNavigate();
   const { addToCart, cartItems, setCartItems } = useCartContext();
   const [isAddedToCart, setIsAddedToCart] = useState(false);
-
+  // const isAddedToCart = cartItems?.some((item) => item?.id === productDetails?.id)
   useEffect(() => {
+    console.log("cartItems",cartItems);
     cartItems.some((item) => {
-      if(item?.id == productDetails?.id){
+      if(item?._id == productDetails?._id){
         setIsAddedToCart(true);
       }
     })
-  }, [cartItems,productDetails?.id])
+  }, [cartItems,productDetails?._id])
   
 
   const handleCardClick = () => {
     console.log(productDetails);
-    if (productDetails && productDetails.id) {
-      navigate(`/product/${productDetails.id}`, { state: productDetails });
+    if (productDetails && productDetails._id) {
+      navigate(`/product/${productDetails._id}`, { state: productDetails });
     } else {
       console.error("Product data or ID is undefined!");
     }
@@ -47,12 +48,18 @@ export default function DynamicCard({
     <div
       className={`${bgColor} p-6 rounded-lg shadow-lg transition-transform transform hover:scale-105 hover:shadow-2xl max-w-full text-amber-800`}
       onClick={handleCardClick}
+      style={{
+        boxShadow: `inset 0px 4px 8px rgba(0, 0, 0, 0.04),
+                    inset 0px -4px 8px rgba(0, 0, 0, 0.04),
+                    inset 4px 0px 8px rgba(0, 0, 0, 0.04),
+                    inset -4px 0px 8px rgba(0, 0, 0, 0.04)`,
+      }}
     >
       {imageUrl && (
         <div className="h-64 w-full mb-4 overflow-hidden rounded-lg">
           <img
             src={imageUrl}
-            className="w-full h-full object-cover transition-transform transform hover:scale-110 duration-300"
+            className="w-full h-full object-contain transition-transform transform hover:scale-110 duration-300"
             alt={title}
           />
         </div>
@@ -60,7 +67,7 @@ export default function DynamicCard({
       <h1 className="text-3xl font-bold mb-4 text-center uppercase tracking-wider">
         {title}
       </h1>
-      <p className="text-lg text-center opacity-90">$ {price}</p>
+      <p className="text-lg text-center opacity-90">₹ {price}</p>
       <p className="text-lg text-center opacity-90">{description}</p>
 
       {/* Icon container */}

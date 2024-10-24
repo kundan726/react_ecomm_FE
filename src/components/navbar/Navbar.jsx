@@ -5,13 +5,15 @@ import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useCartContext } from "../../context/cartContext";
+import { useAuthContext } from "../../context/authContect";
+
 export default function Navbar() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [role, setRole] = useState(null);
   const navigate = useNavigate();
   const { cartItems } = useCartContext();
   const [cartCount, setCartCount] = useState(0);
-
+  const authDetails = useAuthContext()
   useEffect(() => {
     const handleStorageChange = () => {
       setToken(localStorage.getItem("token"));
@@ -27,6 +29,12 @@ export default function Navbar() {
   useEffect(() => {
     getDetailsFromToken(token);
   }, [token]);
+
+  useEffect(() => {
+    if(authDetails){
+      console.log("111111",authDetails)
+    }
+  })
 
   const getDetailsFromToken = (token) => {
     try {
@@ -91,6 +99,9 @@ export default function Navbar() {
     <div>
       <div className="flex w-full p-2 justify-end bg-amber-900 text-white h-16">
         <ul className="flex space-x-8 p-3 mr-8 cursor-pointer">
+          {authDetails  && <li>
+            {authDetails?.authDetails?.username}
+          </li> }
           {finalPages.map(({ name, path }, index) => (
             <li key={index}>
               <NavLink

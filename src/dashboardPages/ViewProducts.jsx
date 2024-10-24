@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCall } from "../services/authServices/axios/apiCall";
+import { getCall, postCall } from "../services/authServices/axios/apiCall";
 import ENDPOINTS from "../api/endpoints";
 import { useUserContext } from "../context/userContext.jsx";
+import {deleteToast} from '../toast/authToast.jsx';
+import { toast } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 
 const ViewProducts = () => {
   const navigate = useNavigate();
@@ -13,7 +16,7 @@ const ViewProducts = () => {
     const fetchProductList = async () => {
       try {
         const params = {
-          apiEndpoint: ENDPOINTS?.dev?.PRODUCT_MODULE?.listProduct(userEmail),
+          apiEndpoint: ENDPOINTS?.dev?.PRODUCT_MODULE?.listSellerProducts(userEmail),
           data: {},
         };
 
@@ -43,23 +46,49 @@ const ViewProducts = () => {
     }
   }, [setUserEmail]);
 
-
-
   const handleEdit = (productId) => {
     console.log("product to be edited : ", productId);
     navigate(`/dashboard/addProduct/${productId}`);
   };
 
-  const handleDelete = (productId) => {
+  const handleDelete = async (productId) => {
     console.log(`Delete product with ID: ${productId}`);
-    // Implement delete logic here
+    const params = {
+      apiEndpoint: ENDPOINTS?.dev?.PRODUCT_MODULE?.deleteProduct(productId ),
+      data: {},
+    };
+
+    const response = await postCall(params);  
+    console.log("response", response);
+    if (response?.data?.msg === "Product Deleted Successfully") {
+      console.log("Product Deleted Successfully");
+      setProductList((prevItem) => (
+        prevItem.filter(product => product?._id !== productId)
+      ))
+      toast.success(response?.data?.msg, {
+        duration: 5000,
+        position: "top-left",
+        style: {
+          background: "#4ade80",
+          color: "#fff",
+        },
+      });
+  
+      // Delay navigation to allow the toast to be shown
+      setTimeout(() => {
+        navigate(`/dashboard/viewproducts`);
+      }, 1000);
+    } else {
+      console.log("Delete action failed or message mismatch");
+    }
   };
+  
 
-  // Check if productList is empty
-  if (productList.length === 0) return <p>No Products Available</p>;
-
+  if (productList.length === 0) {
+    return <p>No Products Available</p>;
+  }
+  
   const tableHeader = Object.keys(productList[0]);
-
   return (
     <div className="p-4 bg-white rounded-lg shadow-lg">
       <h1 className="flex justify-center text-3xl font-serif font-bold text-gray-800 mb-6">
@@ -127,6 +156,7 @@ const ViewProducts = () => {
           </tbody>
         </table>
       </div>
+      <Toaster />
     </div>
   );
 };
